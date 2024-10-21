@@ -1,0 +1,102 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+    id 'org.openjfx.javafxplugin' version '0.1.0'
+
+    id 'pmd'
+    id 'jacoco'
+    id "com.diffplug.spotless" version "6.25.0"
+    id "com.github.ben-manes.versions" version "0.51.0"
+}
+
+javafx {
+    version = "23.0.1"
+    modules = ['javafx.fxml']
+}
+
+group = 'com.cerocss'
+version = '0.1.0'
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+    mockito {
+        transitive = false
+    }
+}
+
+dependencies {
+    testImplementation "org.testfx:testfx-core:4.0.18"
+    testImplementation "org.testfx:testfx-junit5:4.0.18"
+
+    testImplementation platform('org.junit:junit-bom:5.11.3')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+
+    testImplementation 'org.mockito:mockito-core:5.14.2'
+    mockito('org.mockito:mockito-core:5.14.2')
+}
+
+pmd {
+    toolVersion = "7.6.0"
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                minimum = 1
+            }
+        }
+    }
+}
+
+tasks.named('dependencyUpdates') {
+    checkForGradleUpdate = true
+    revision = "release"
+    gradleReleaseChannel = "current"
+    outputFormatter = "plain, html, json"
+    rejectVersionIf {
+        listOf("BETA").any { it.candidate.uppercase().contains(it) }
+    }
+}
+
+test {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport, jacocoTestCoverageVerification
+    jvmArgs("-javaagent:${configurations.mockito.asPath}")
+    if (project.hasProperty('excludeTests')) {
+        exclude project.property('excludeTests')
+    }
+}
+
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
+jar {
+    manifest {
+        attributes('Implementation-Title': project.name,
+                'Implementation-Version': project.version)
+    }
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = "https://maven.pkg.github.com/cerocss/fxdi"
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
+    publications {
+        maven(MavenPublication) {
+            from components.java
+        }
+    }
+}
