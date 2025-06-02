@@ -70,6 +70,7 @@ public class FXDILoader {
      * Create {@link FXMLLoader} instance that is used to load files.
      *
      * @param url the url of the fxml file to load
+     * @return the preconfigured {@link FXMLLoader}
      */
     public FXMLLoader getFXMLLoaderInstance(URL url) {
         return new FXMLLoader(url, resourceBundle, null, injectionFactory);
