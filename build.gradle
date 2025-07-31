@@ -5,12 +5,12 @@ plugins {
 
     id 'pmd'
     id 'jacoco'
-    id "com.diffplug.spotless" version "7.2.1"
-    id "com.github.ben-manes.versions" version "0.52.0"
+    id 'com.diffplug.spotless' version '7.2.1'
+    id 'com.github.ben-manes.versions' version '0.52.0'
 }
 
 javafx {
-    version = "23.0.1"
+    version = '23.0.1'
     modules = ['javafx.fxml']
 }
 
@@ -28,18 +28,19 @@ configurations {
 }
 
 dependencies {
-    testImplementation "org.testfx:testfx-core:4.0.18"
-    testImplementation "org.testfx:testfx-junit5:4.0.18"
+    testImplementation 'org.testfx:testfx-core:4.0.18'
+    testImplementation 'org.testfx:testfx-junit5:4.0.18'
 
-    testImplementation platform('org.junit:junit-bom:5.11.4')
+    testImplementation platform('org.junit:junit-bom:5.13.4')
     testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
     testImplementation 'org.mockito:mockito-core:5.18.0'
     mockito('org.mockito:mockito-core:5.18.0')
 }
 
 pmd {
-    toolVersion = "7.6.0"
+    toolVersion = '7.6.0'
 }
 
 jacocoTestCoverageVerification {
@@ -54,18 +55,17 @@ jacocoTestCoverageVerification {
 
 tasks.named('dependencyUpdates') {
     checkForGradleUpdate = true
-    revision = "release"
-    gradleReleaseChannel = "current"
-    outputFormatter = "plain, html, json"
+    revision = 'release'
+    gradleReleaseChannel = 'current'
+    outputFormatter = 'plain, html, json'
     rejectVersionIf {
-        listOf("BETA").any { it.candidate.uppercase().contains(it) }
+        listOf('BETA').any { it.candidate.uppercase().contains(it) }
     }
 }
 
 test {
     useJUnitPlatform()
     finalizedBy jacocoTestReport, jacocoTestCoverageVerification
-    jvmArgs("-javaagent:${configurations.mockito.asPath}")
     if (project.hasProperty('excludeTests')) {
         exclude project.property('excludeTests')
     }
@@ -86,11 +86,11 @@ jar {
 publishing {
     repositories {
         maven {
-            name = "GitHubPackages"
-            url = "https://maven.pkg.github.com/cerocss/fxdi"
+            name = 'GitHubPackages'
+            url = 'https://maven.pkg.github.com/cerocss/fxdi'
             credentials {
-                username = System.getenv("GITHUB_ACTOR")
-                password = System.getenv("GITHUB_TOKEN")
+                username = System.getenv('GITHUB_ACTOR')
+                password = System.getenv('GITHUB_TOKEN')
             }
         }
     }
